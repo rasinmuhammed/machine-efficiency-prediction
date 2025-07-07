@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Manufacturing Machine Efficiency Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            margin-top: 10px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '⚙️';
+            font-size: 1.2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .predict-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .predict-btn:active {
+            transform: translateY(0);
+        }
+
+        .predict-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .predict-btn:hover::before {
+            left: 100%;
+        }
+
+        .results-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 300px;
+        }
+
+        .results-placeholder {
+            opacity: 0.6;
+            font-size: 1.1rem;
+            color: #7f8c8d;
+        }
+
+        .prediction-result {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .prediction-low {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .prediction-medium {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .prediction-high {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .prediction-error {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+
+        .status-indicator {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        .form-tips {
+            background: linear-gradient(135deg, #e8f4f8, #d1ecf1);
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Smart Manufacturing Machine Efficiency Prediction</h1>
+            <p>Advanced AI-powered efficiency analysis for industrial operations</p>
+        </div>
+
+        <div class="main-content">
+            <div class="form-section">
+                <h2 class="section-title">Input Parameters</h2>
+                <form method="POST">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="operation_mode">Operation Mode</label>
+                            <select id="operation_mode" name="Operation_Mode" required>
+                                <option value="">Select Mode</option>
+                                <option value="0">Manual</option>
+                                <option value="1">Semi-Auto</option>
+                                <option value="2">Automatic</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="temperature">Temperature (°C)</label>
+                            <input type="number" id="temperature" name="Temperature_C" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="vibration">Vibration (Hz)</label>
+                            <input type="number" id="vibration" name="Vibration_Hz" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="power_consumption">Power Consumption (kW)</label>
+                            <input type="number" id="power_consumption" name="Power_Consumption_kW" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="network_latency">Network Latency (ms)</label>
+                            <input type="number" id="network_latency" name="Network_Latency_ms" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="packet_loss">Packet Loss (%)</label>
+                            <input type="number" id="packet_loss" name="Packet_Loss_%" step="0.01" min="0" max="100" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="defect_rate">Quality Control Defect Rate (%)</label>
+                            <input type="number" id="defect_rate" name="Quality_Control_Defect_Rate_%" step="0.01" min="0" max="100" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="production_speed">Production Speed (units/hr)</label>
+                            <input type="number" id="production_speed" name="Production_Speed_units_per_hr" step="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maintenance_score">Predictive Maintenance Score</label>
+                            <input type="number" id="maintenance_score" name="Predictive_Maintenance_Score" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="error_rate">Error Rate (%)</label>
+                            <input type="number" id="error_rate" name="Error_Rate_%" step="0.01" min="0" max="100" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="year">Year</label>
+                            <input type="number" id="year" name="Year" value="2024" min="2020" max="2030" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="month">Month</label>
+                            <select id="month" name="Month" required>
+                                <option value="">Select Month</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="day">Day</label>
+                            <input type="number" id="day" name="Day" min="1" max="31" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hour">Hour</label>
+                            <input type="number" id="hour" name="Hour" min="0" max="23" required>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <button type="submit" class="predict-btn">
+                                Predict Efficiency
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="form-tips">
+                    <strong>💡 Tips:</strong> Ensure all parameters are within realistic ranges for accurate predictions. Temperature should be in operational range, vibration levels should be monitored, and percentage values should be between 0-100.
+                    <br><br>
+                    <button type="button" onclick="loadSampleData()" class="predict-btn" style="margin-top: 10px; background: linear-gradient(135deg, #27ae60, #2ecc71);">
+                        Load Sample Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="results-section">
+                {% if prediction %}
+                    <h3>Prediction Result</h3>
+                    {% if prediction == "High" %}
+                        <div class="prediction-result prediction-high">
+                            Efficiency: {{ prediction }}
+                        </div>
+                        <div class="status-indicator prediction-high">
+                            🚀
+                        </div>
+                        <p style="font-size: 1.1rem; line-height: 1.6; color: #2c3e50; margin-top: 15px;">
+                            Excellent operational efficiency! Your machine is performing optimally with minimal defects and optimal resource utilization.
+                        </p>
+                    {% elif prediction == "Medium" %}
+                        <div class="prediction-result prediction-medium">
+                            Efficiency: {{ prediction }}
+                        </div>
+                        <div class="status-indicator prediction-medium">
+                            ⚡
+                        </div>
+                        <p style="font-size: 1.1rem; line-height: 1.6; color: #2c3e50; margin-top: 15px;">
+                            Good operational efficiency with room for improvement. Consider optimizing temperature, vibration, or error rates.
+                        </p>
+                    {% elif prediction == "Low" %}
+                        <div class="prediction-result prediction-low">
+                            Efficiency: {{ prediction }}
+                        </div>
+                        <div class="status-indicator prediction-low">
+                            ⚠️
+                        </div>
+                        <p style="font-size: 1.1rem; line-height: 1.6; color: #2c3e50; margin-top: 15px;">
+                            Machine efficiency is below optimal levels. Immediate attention recommended for temperature, vibration, and error rates.
+                        </p>
+                    {% elif "Error:" in prediction %}
+                        <div class="prediction-result prediction-error">
+                            {{ prediction }}
+                        </div>
+                        <div class="status-indicator prediction-error">
+                            ❌
+                        </div>
+                        <p style="font-size: 1.1rem; line-height: 1.6; color: #2c3e50; margin-top: 15px;">
+                            There was an error processing your request. Please check your input values and try again.
+                        </p>
+                    {% endif %}
+                {% else %}
+                    <div class="results-placeholder">
+                        <div class="status-indicator" style="background: linear-gradient(135deg, #bdc3c7, #95a5a6); color: white;">
+                            🤖
+                        </div>
+                        <h3>Awaiting Prediction</h3>
+                        <p>Fill in the parameters and click "Predict Efficiency" to get your machine efficiency analysis</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set current date as default
+        const now = new Date();
+        document.getElementById('year').value = now.getFullYear();
+        document.getElementById('month').value = now.getMonth() + 1;
+        document.getElementById('day').value = now.getDate();
+        document.getElementById('hour').value = now.getHours();
+
+        // Load sample data function
+        function loadSampleData() {
+            document.getElementById('operation_mode').value = "2";
+            document.getElementById('temperature').value = "75";
+            document.getElementById('vibration').value = "45";
+            document.getElementById('power_consumption').value = "85";
+            document.getElementById('network_latency').value = "25";
+            document.getElementById('packet_loss').value = "1.2";
+            document.getElementById('defect_rate').value = "3.5";
+            document.getElementById('production_speed').value = "150";
+            document.getElementById('maintenance_score').value = "85";
+            document.getElementById('error_rate').value = "2.1";
+        }
+    </script>
+</body>
+</html>
