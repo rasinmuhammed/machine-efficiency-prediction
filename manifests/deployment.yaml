@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: machine-efficiency-prediction
-        image: 
+        image: muhammedrasin0/gitops-project:latest
         ports:
         - containerPort: 5002
